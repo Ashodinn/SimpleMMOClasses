@@ -60,8 +60,9 @@ namespace SimpleMMOClasses
                 "If on, the configuration is locked and can be changed by server admins only.");
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
 
+            // This is a "TEST" just to see something appear in the game.  This has been confirmed to work
             Skill
-                    warrior = new("Warrior", "warrior-icon.png");
+                    warrior = new("warrior", "warrior-icon.png");
             warrior.Description.English("Reduces damage taken by 0.2% per level.");
             warrior.Name.German("Hartnäckigkeit"); // Use this to localize values for the name
             warrior.Description.German(
