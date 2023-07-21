@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Object = UnityEngine.Object;
 
 namespace SimpleMMOClasses
 {    
@@ -25,9 +26,12 @@ namespace SimpleMMOClasses
         private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
         internal static string ConnectionError = "";
 
+        public static GameObject simpleMMOClassesPanel;
         
         public static readonly ManualLogSource SimpleMMOClassesLogger =
             BepInEx.Logging.Logger.CreateLogSource(ModName);
+
+        private static ConfigEntry<KeyCode> _panelToggleKey;
 
         private static readonly ConfigSync ConfigSync = new(ModGUID)
             { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -60,7 +64,7 @@ namespace SimpleMMOClasses
                 "If on, the configuration is locked and can be changed by server admins only.");
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
 
-            // This is a "TEST" just to see something appear in the game.  This has been confirmed to work
+            
             Skill
                     warrior = new("warrior", "warrior-icon.png");
             warrior.Description.English("Reduces damage taken by 0.2% per level.");
@@ -68,14 +72,18 @@ namespace SimpleMMOClasses
             warrior.Description.German(
                 "Reduziert erlittenen Schaden um 0,2% pro Stufe."); // You can do the same for the description
             warrior.Configurable = true;
+                        
+            _panelToggleKey = config<KeyCode>("1 - General", "Panel Toggle Key", KeyCode.O,
+                "Key used to toggle the panel on and off.");
 
+            simpleMMOClassesPanel = Object.Instantiate(globalprefabVariable);
+            Object.DontDestroyOnLoad(simpleMMOClassesPanel);
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             Harmony harmony = new(ModGUID);
             harmony.PatchAll(assembly);
             SetupWatcher();                        
         }
-        
 
         private static AssetBundle GetAssetBundleFromResources(string filename)
         {
@@ -89,11 +97,21 @@ namespace SimpleMMOClasses
             }
         }
 
+
         public static void LoadAssets()
         {
             var assetBundle = GetAssetBundleFromResources("simplemmoclassespanel");
             globalprefabVariable = assetBundle.LoadAsset<GameObject>("simpleMMOClassesPanel");
             assetBundle?.Unload(false);
+
+            if (globalprefabVariable != null)
+            {
+
+                simpleMMOClassesPanel = Object.Instantiate(globalprefabVariable);
+                UnityEngine.Object.DontDestroyOnLoad(simpleMMOClassesPanel);
+            }
+
+            
         }
 
         private void OnDestroy()
@@ -124,6 +142,19 @@ namespace SimpleMMOClasses
             {
                 SimpleMMOClassesLogger.LogError($"There was an issue loading your {ConfigFileName}");
                 SimpleMMOClassesLogger.LogError("Please check your config entries for spelling and format!");
+            }
+        }
+
+        void Update()
+        {
+            if (Input.GetKeyDown(_panelToggleKey.Value)) // Optionally check for Player.TakeInput here so you don't accidentally open the UI
+            {
+                // Assuming the 'globalprefabVariable' is the panel you want to toggle
+                if (globalprefabVariable != null)
+                {
+                    // Toggle active state of the panel
+                    globalprefabVariable.SetActive(!globalprefabVariable.activeSelf);
+                }
             }
         }
 
