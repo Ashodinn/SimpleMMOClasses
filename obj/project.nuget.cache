@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "VDUnODFiRwyk9WCMsbENMOGCmDdgaAuLV0Xe/wZhKVwLNeBAlDS8qnF26H5JWQ79CSeMji6srFKt1GzcCOeV8Q==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Nonya\\source\\repos\\new\\SimpleMMOClasses\\SimpleMMOClasses.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Nonya\\.nuget\\packages\\ilrepack.lib.msbuild.task\\2.0.18.2\\ilrepack.lib.msbuild.task.2.0.18.2.nupkg.sha512",
+    "C:\\Users\\Nonya\\.nuget\\packages\\yamldotnet\\13.1.0\\yamldotnet.13.1.0.nupkg.sha512"
+  ],
+  "logs": []
+}
