@@ -1,0 +1,64 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Nonya\\RiderProjects\\SimpleMMOClasses\\SimpleMMOClasses\\SimpleMMOClasses.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Nonya\\RiderProjects\\SimpleMMOClasses\\SimpleMMOClasses\\SimpleMMOClasses.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Nonya\\RiderProjects\\SimpleMMOClasses\\SimpleMMOClasses\\SimpleMMOClasses.csproj",
+        "projectName": "SimpleMMOClasses",
+        "projectPath": "C:\\Users\\Nonya\\RiderProjects\\SimpleMMOClasses\\SimpleMMOClasses\\SimpleMMOClasses.csproj",
+        "packagesPath": "C:\\Users\\Nonya\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Nonya\\RiderProjects\\SimpleMMOClasses\\SimpleMMOClasses\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\Nonya\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net462"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net462": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net462": {
+          "dependencies": {
+            "ILRepack.Lib.MSBuild.Task": {
+              "target": "Package",
+              "version": "[2.0.18.2, )"
+            },
+            "YamlDotNet": {
+              "target": "Package",
+              "version": "[13.1.0, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-arm64": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}
