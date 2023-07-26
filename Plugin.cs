@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
@@ -6,6 +6,9 @@ using BepInEx.Logging;
 using HarmonyLib;
 using SkillManager;
 using ServerSync;
+using JetBrains.Annotations;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Object = UnityEngine.Object;
@@ -95,8 +98,6 @@ namespace SimpleMMOClasses
                 SimpleMMOClassesPanel = Object.Instantiate(globalprefabVariable);
                 UnityEngine.Object.DontDestroyOnLoad(SimpleMMOClassesPanel);
             }
-
-
         }
 
         private void OnDestroy()
@@ -147,7 +148,7 @@ namespace SimpleMMOClasses
         #region ConfigOptions
 
         private static ConfigEntry<Toggle> _serverConfigLocked = null!;
-        public static GameObject? globalprefabVariable;
+        public static GameObject globalprefabVariable;
 
 
         private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
