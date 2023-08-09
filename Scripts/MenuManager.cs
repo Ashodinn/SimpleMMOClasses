@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class MenuManager : MonoBehaviour
 {
-    public GameObject classSelectionPanel;
+    public GameObject ActivateSelectionPanel;
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.O))
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
-            classSelectionPanel.gameObject.SetActive(!classSelectionPanel.gameObject.activeSelf);
+            ActivateSelectionPanel.gameObject.SetActive(!ActivateSelectionPanel.gameObject.activeSelf);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ActivateSelectionPanel.gameObject.SetActive(false);
         }
     }
 }
