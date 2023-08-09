@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
@@ -11,7 +11,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.PlayerLoop;
+using YamlDotNet.Core.Tokens;
 using Object = UnityEngine.Object;
+
 
 namespace SimpleMMOClasses
 {
@@ -44,6 +47,8 @@ namespace SimpleMMOClasses
             Off = 0
         }
 
+
+
         public void Awake()
         {
             // Uncomment the line below to use the LocalizationManager for localizing your mod.
@@ -51,28 +56,86 @@ namespace SimpleMMOClasses
             _serverConfigLocked = config("1 - General", "Lock Configuration", Toggle.On,
             "If on, the configuration is locked and can be changed by server admins only.");
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
+            
+                Skill
+                    warrior = new("Warrior", "warrior-icon.png");
+                warrior.Description.English("Reduces damage taken by 0.2% per level.");
+                warrior.Name.German("Hartnäckigkeit"); // Use this to localize values for the name
+                warrior.Description.German(
+                    "Reduziert erlittenen Schaden um 0,2% pro Stufe."); // You can do the same for the description
+                warrior.Configurable = true;
+            
+                Skill
+                    paladin = new("Paladin", "paladin-icon.png");
+                paladin.Description.English("Reduces damage taken by 0.2% per level.");
+                paladin.Name.German("Hartnäckigkeit"); // Use this to localize values for the name
+                paladin.Description.German(
+                    "Reduziert erlittenen Schaden um 0,2% pro Stufe."); // You can do the same for the description
+                paladin.Configurable = true;
+                
+                Skill
+                    rogue = new("Rogue", "rogue-icon.png");
+                rogue.Description.English("Reduces damage taken by 0.2% per level.");
+                rogue.Name.German("Hartnäckigkeit"); // Use this to localize values for the name
+                rogue.Description.German(
+                    "Reduziert erlittenen Schaden um 0,2% pro Stufe."); // You can do the same for the description
+                rogue.Configurable = true;
+            
+                Skill
+                    hunter = new("Hunter", "hunter-icon.png");
+                hunter.Description.English("Reduces damage taken by 0.2% per level.");
+                hunter.Name.German("Hartnäckigkeit"); // Use this to localize values for the name
+                hunter.Description.German(
+                    "Reduziert erlittenen Schaden um 0,2% pro Stufe."); // You can do the same for the description
+                hunter.Configurable = true;
+           
+                Skill
+                    priest = new("Priest", "priest-icon.png");
+                priest.Description.English("Reduces damage taken by 0.2% per level.");
+                priest.Name.German("Hartnäckigkeit"); // Use this to localize values for the name
+                priest.Description.German(
+                    "Reduziert erlittenen Schaden um 0,2% pro Stufe."); // You can do the same for the description
+                priest.Configurable = true;
+            
+                Skill
+                    druid = new("Druid", "druid-icon.png");
+                druid.Description.English("Reduces damage taken by 0.2% per level.");
+                druid.Name.German("Hartnäckigkeit"); // Use this to localize values for the name
+                druid.Description.German(
+                    "Reduziert erlittenen Schaden um 0,2% pro Stufe."); // You can do the same for the description
+                druid.Configurable = true;
+            
+                Skill
+                    mage = new("Mage", "mage-icon.png");
+                mage.Description.English("Reduces damage taken by 0.2% per level.");
+                mage.Name.German("Hartnäckigkeit"); // Use this to localize values for the name
+                mage.Description.German(
+                    "Reduziert erlittenen Schaden um 0,2% pro Stufe."); // You can do the same for the description
+                mage.Configurable = true;
+            
+                Skill
+                    warlock = new("Warlock", "warlock-icon.png");
+                warlock.Description.English("Reduces damage taken by 0.2% per level.");
+                warlock.Name.German("Hartnäckigkeit"); // Use this to localize values for the name
+                warlock.Description.German(
+                    "Reduziert erlittenen Schaden um 0,2% pro Stufe."); // You can do the same for the description
+                warlock.Configurable = true;
+                 
+            
 
-            SimpleMMOClassesPanel = Object.Instantiate(globalprefabVariable);
-            Object.DontDestroyOnLoad(SimpleMMOClassesPanel);
-
-            Skill
-                    warrior = new("warrior", "warrior-icon.png");
-            warrior.Description.English("Reduces damage taken by 0.2% per level.");
-            warrior.Name.German("Hartnäckigkeit"); // Use this to localize values for the name
-            warrior.Description.German(
-                "Reduziert erlittenen Schaden um 0,2% pro Stufe."); // You can do the same for the description
-            warrior.Configurable = true;
-
-            _panelToggleKey = config<KeyCode>("1 - General", "Panel Toggle Key", KeyCode.O,
+            LoadAssets();
+            
+            _panelToggleKey = config<KeyCode>("1 - General", "Panel Toggle Key", KeyCode.Tab,
                 "Key used to toggle the panel on and off.");
-
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             Harmony harmony = new(ModGUID);
             harmony.PatchAll(assembly);
             SetupWatcher();
+            
+            
         }
-
+        
         private static AssetBundle GetAssetBundleFromResources(string filename)
         {
             var execAssembly = Assembly.GetExecutingAssembly();
@@ -99,6 +162,379 @@ namespace SimpleMMOClasses
                 UnityEngine.Object.DontDestroyOnLoad(SimpleMMOClassesPanel);
             }
         }
+   
+        
+        // Blocking Skills by Class system
+        [HarmonyPatch(typeof(Skills.Skill), nameof(Skills.Skill.Raise))]
+        private static class SkillCapping
+        {
+            private static bool Prefix(Skills.Skill __instance)
+            {
+                if (Player.m_localPlayer.m_customData.ContainsValue("Warrior")) //Warrior
+                {
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "ElementalMagic"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "BloodMagic"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Sneak"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Crossbows"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Bows"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                }
+                
+                else if (Player.m_localPlayer.m_customData.ContainsValue("Paladin")) //Paladin
+                {
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "ElementalMagic"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "BloodMagic"))
+                    {
+                        return __instance.m_level < 50f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Unarmed"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Sneak"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Bows"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Crossbows"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                } 
+                
+                else if (Player.m_localPlayer.m_customData.ContainsValue("Rogue")) //Rogue
+                {
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Blocking"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Polearms"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "BloodMagic"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "ElementalMagic"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Bows"))
+                    {
+                        return __instance.m_level < 50f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Crossbows"))
+                    {
+                        return __instance.m_level < 50f;
+                    }
+                }
+                
+                else if (Player.m_localPlayer.m_customData.ContainsValue("Hunter"))
+                {
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Blocking"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Polearms"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "BloodMagic"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "ElementalMagic"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Clubs"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Swords"))
+                    {
+                        return __instance.m_level < 30f;
+                    }
+                }
+                
+                else if (Player.m_localPlayer.m_customData.ContainsValue("Priest")) //Priest
+                {
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Unarmed"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Axes"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Blocking"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Bows"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Swords"))
+                    {
+                        return __instance.m_level < 30f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "ElementalMagic"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                }
+                
+                else if (Player.m_localPlayer.m_customData.ContainsValue("Druid")) //Druid
+                {
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Knives"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Blocking"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Swords"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "BloodMagic"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Polearms"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                }
+                
+                else if (Player.m_localPlayer.m_customData.ContainsValue("Mage")) //Mage
+                {
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Unarmed"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Axes"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Blocking"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Bows"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Crossbows"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Swords"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "BloodMagic"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                }
+                
+                else if (Player.m_localPlayer.m_customData.ContainsValue("Warlock")) //Warlock
+                {
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Axes"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Blocking"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Bows"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Crossbows"))
+                    {
+                        return __instance.m_level < 20f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "Swords"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                    if (string.Equals(__instance.m_info.m_skill.ToString(), "ElementalMagic"))
+                    {
+                        return __instance.m_level < 0f;
+                    }
+                }
+
+
+                return true;
+            }
+        }
+        
+        //LEVELING SYSTEM
+        [HarmonyPatch(typeof(Player), nameof(Player.OnSkillLevelup))]
+        static class WarriorLeveling
+        {
+            [UsedImplicitly]
+            private static void Prefix(Player __instance, Skills.SkillType skill, float level)
+            {
+
+                if (Player.m_localPlayer.m_customData.ContainsValue("Warrior"))
+                {
+                    if (skill is Skills.SkillType.Unarmed || skill is Skills.SkillType.Clubs || skill is Skills.SkillType.Blocking || skill is Skills.SkillType.Swords)
+                    {
+                        __instance.RaiseSkill(Skill.fromName("Warrior"), 0.25f);
+                    }
+
+                }
+            }
+        }
+        
+        [HarmonyPatch(typeof(Player), nameof(Player.OnSkillLevelup))]
+        static class PaladinLeveling
+        {
+            [UsedImplicitly]
+            private static void Prefix(Player __instance, Skills.SkillType skill, float level)
+            {
+
+                if (Player.m_localPlayer.m_customData.ContainsValue("Paladin"))
+                {
+                    if (skill is Skills.SkillType.Unarmed || skill is Skills.SkillType.Clubs || skill is Skills.SkillType.Blocking || skill is Skills.SkillType.Swords)
+                    {
+                        __instance.RaiseSkill(Skill.fromName("Paladin"), 0.25f);
+                    }
+                }
+            }
+        }
+        
+        [HarmonyPatch(typeof(Player), nameof(Player.OnSkillLevelup))]
+        static class RogueLeveling
+        {
+            [UsedImplicitly]
+            private static void Prefix(Player __instance, Skills.SkillType skill, float level)
+            {
+                if (Player.m_localPlayer.m_customData.ContainsValue("Rogue"))
+                {
+                    if (skill is Skills.SkillType.Unarmed || skill is Skills.SkillType.Knives || skill is Skills.SkillType.Bows || skill is Skills.SkillType.Spears)
+                    {
+                        __instance.RaiseSkill(Skill.fromName("Hunter"), 0.25f);
+                    }
+                }
+                
+            }
+        }
+        
+        [HarmonyPatch(typeof(Player), nameof(Player.OnSkillLevelup))]
+        static class HunterLeveling
+        {
+            [UsedImplicitly]
+            private static void Prefix(Player __instance, Skills.SkillType skill, float level)
+            {
+                if (Player.m_localPlayer.m_customData.ContainsValue("Hunter"))
+                {
+                    if (skill is Skills.SkillType.Bows || skill is Skills.SkillType.Knives || skill is Skills.SkillType.Spears || skill is Skills.SkillType.Swords)
+                    {
+                        __instance.RaiseSkill(Skill.fromName("Hunter"), 0.25f);
+                    }
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.OnSkillLevelup))]
+        static class PriestLeveling
+        {
+            [UsedImplicitly]
+            private static void Prefix(Player __instance, Skills.SkillType skill, float level)
+            {
+                if (Player.m_localPlayer.m_customData.ContainsValue("Priest"))
+                {
+                    if (skill is Skills.SkillType.BloodMagic || skill is Skills.SkillType.Clubs || skill is Skills.SkillType.Spears || skill is Skills.SkillType.Polearms)
+                        
+                    {
+                        __instance.RaiseSkill(Skill.fromName("Priest"), 0.25f);
+                    }
+                }
+                
+            }
+        }
+        
+        [HarmonyPatch(typeof(Player), nameof(Player.OnSkillLevelup))]
+        static class DruidLeveling
+        {
+            [UsedImplicitly]
+            private static void Prefix(Player __instance, Skills.SkillType skill, float level)
+            {
+                if (Player.m_localPlayer.m_customData.ContainsValue("Druid"))
+                {
+                    if (skill is Skills.SkillType.ElementalMagic || skill is Skills.SkillType.Spears || skill is Skills.SkillType.Bows || skill is Skills.SkillType.Polearms)
+                    {
+                        __instance.RaiseSkill(Skill.fromName("Druid"), 0.25f);
+                    }
+                }
+                
+            }
+        }
+
+        
+        [HarmonyPatch(typeof(Player), nameof(Player.OnSkillLevelup))]
+        static class MageLeveling
+        {
+            [UsedImplicitly]
+            private static void Prefix(Player __instance, Skills.SkillType skill, float level)
+            {
+                if (Player.m_localPlayer.m_customData.ContainsValue("Mage"))
+                {
+                    if (skill is Skills.SkillType.ElementalMagic || skill is Skills.SkillType.Clubs || skill is Skills.SkillType.Spears || skill is Skills.SkillType.Polearms)
+                    {
+                        __instance.RaiseSkill(Skill.fromName("Mage"), 0.25f);
+                    }
+                }
+            }
+        }
+        
+        [HarmonyPatch(typeof(Player), nameof(Player.OnSkillLevelup))]
+        static class WarlockLeveling
+        {
+            [UsedImplicitly]
+            private static void Prefix(Player __instance, Skills.SkillType skill, float level)
+            {
+                if (Player.m_localPlayer.m_customData.ContainsValue("Warlock"))
+                {
+                    if (skill is Skills.SkillType.ElementalMagic || skill is Skills.SkillType.Spears || skill is Skills.SkillType.Bows || skill is Skills.SkillType.Polearms)
+                    {
+                        __instance.RaiseSkill(Skill.fromName("Warlock"), 0.25f);
+                    }
+                }
+            }
+        }
+
+   
+     
+        
 
         private void OnDestroy()
         {
@@ -131,21 +567,7 @@ namespace SimpleMMOClasses
             }
         }
 
-        void Update()
-        {
-            if (Input.GetKeyDown(_panelToggleKey.Value)) // Optionally check for Player.TakeInput here so you don't accidentally open the UI
-            {
-                // Assuming the 'globalprefabVariable' is the panel you want to toggle
-                if (globalprefabVariable != null)
-                {
-                    // Toggle active state of the panel
-                    globalprefabVariable.SetActive(!globalprefabVariable.activeSelf);
-                }
-            }
-        }
-
-
-        #region ConfigOptions
+       #region ConfigOptions
 
         private static ConfigEntry<Toggle> _serverConfigLocked = null!;
         public static GameObject globalprefabVariable;
